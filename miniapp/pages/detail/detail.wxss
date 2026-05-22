@@ -1,0 +1,80 @@
+.panel {
+  margin-bottom: 18rpx;
+  padding: 24rpx;
+  border: 1rpx solid #dbe5e2;
+  border-radius: 8rpx;
+  background: #fff;
+}
+
+.row {
+  display: flex;
+  justify-content: space-between;
+  gap: 20rpx;
+  padding: 14rpx 0;
+  border-bottom: 1rpx solid #eef3f1;
+  font-size: 28rpx;
+}
+
+.row:last-child {
+  border-bottom: 0;
+}
+
+.result {
+  font-size: 30rpx;
+  line-height: 1.6;
+}
+
+.subscribe-btn {
+  margin-top: 8rpx;
+}
+
+.schedule-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 18rpx;
+  padding: 18rpx 0;
+  border-bottom: 1rpx solid #eef3f1;
+}
+
+.schedule-row:last-child {
+  border-bottom: 0;
+}
+
+.schedule-date {
+  font-size: 28rpx;
+  font-weight: 700;
+}
+
+.schedule-meta {
+  margin-top: 6rpx;
+  color: #64716f;
+  font-size: 24rpx;
+}
+
+.schedule-status {
+  flex: 0 0 auto;
+  padding: 8rpx 14rpx;
+  border-radius: 999rpx;
+  font-size: 24rpx;
+}
+
+.schedule-available {
+  background: #dcfce7;
+  color: #166534;
+}
+
+.schedule-full {
+  background: #f1f5f9;
+  color: #475569;
+}
+
+.schedule-stopped {
+  background: #fee2e2;
+  color: #991b1b;
+}
+
+.schedule-expired {
+  background: #f3f4f6;
+  color: #6b7280;
+}

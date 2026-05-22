@@ -1,0 +1,11 @@
+node_modules/
+.env
+*.log
+*.db
+*.sqlite
+*.sqlite3
+.DS_Store
+dist/
+coverage/
+miniprogram_npm/
+server/data/

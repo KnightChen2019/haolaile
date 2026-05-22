@@ -1,0 +1,18 @@
+<view class="page">
+  <view class="panel">
+    <view class="section-title">通知成员</view>
+    <view class="row"><text>当前已登记</text><text>{{notifyOpenidCountText}}</text></view>
+    <view class="hint">你太太也要收到提醒时，让她用自己的微信打开体验版，在任一医生详情页点击“订阅有号提醒”，并在弹窗里选择允许。</view>
+    <view class="hint">完成后后端会自动登记她的微信，后续发现可约号源时会同时通知已登记成员。</view>
+  </view>
+
+  <view class="panel">
+    <view class="section-title">监控配置</view>
+    <view class="todo">林星光 · 光谷院区 · 产科</view>
+    <view class="todo">凃巍 · 汉口院区 · 风湿免疫内科</view>
+    <view class="todo">凃巍 · 光谷院区 · 风湿免疫内科</view>
+    <view class="todo">专家号 · 副主任医师</view>
+    <view class="todo">未来 15 天滚动窗口</view>
+    <view class="todo">重点时段 16:50-17:10</view>
+  </view>
+</view>

@@ -1,0 +1,42 @@
+<view class="page">
+  <view class="panel">
+    <view class="section-title">{{monitor.doctorName || "医生详情"}}</view>
+    <view class="row"><text>科室</text><text>{{monitor.departmentName || "-"}}</text></view>
+    <view class="row"><text>院区</text><text>{{monitor.campusName || "-"}}</text></view>
+    <view class="row"><text>号源类型</text><text>{{monitor.registrationType || "-"}}</text></view>
+    <view class="row"><text>重点时段</text><text>{{monitor.priorityWindow || "-"}}</text></view>
+    <view class="row"><text>状态</text><text>{{monitor.enabled ? "监控中" : "已暂停"}}</text></view>
+    <view class="row"><text>最近检查</text><text>{{monitor.lastCheckedAt || "-"}}</text></view>
+  </view>
+
+  <view class="panel">
+    <view class="section-title">最近结果</view>
+    <view class="result">{{monitor.lastResultSummary || "暂无结果"}}</view>
+  </view>
+
+  <view class="panel">
+    <view class="section-title">{{windowDays}} 天排班</view>
+    <view wx:if="{{!scheduleRows.length}}" class="muted">{{emptyScheduleText}}</view>
+    <view wx:for="{{scheduleRows}}" wx:key="scheduleId" class="schedule-row">
+      <view>
+        <view class="schedule-date">{{item.visitDate}} {{item.weekday}}</view>
+        <view class="schedule-meta">{{item.durationName}} · {{item.specName || monitor.departmentName}} · {{item.regTypeName}} · ¥{{item.regPrice || "-"}}</view>
+      </view>
+      <view class="schedule-status {{item.statusClass}}">{{item.availableStatusName}}</view>
+    </view>
+  </view>
+
+  <view class="panel">
+    <view class="section-title">有号提醒</view>
+    <view class="muted" wx:if="{{!subscribeTemplateIds.length}}">提醒功能暂未启用，请稍后再试。</view>
+    <button class="subscribe-btn" type="primary" disabled="{{subscribeLoading || !subscribeTemplateIds.length}}" bindtap="subscribeForAlerts">
+      {{subscribeButtonText}}
+    </button>
+    <view class="muted">{{subscribeHint}}</view>
+  </view>
+
+  <view class="panel">
+    <view class="section-title">说明</view>
+    <view class="muted">每个微信账号都需要自己点击一次订阅提醒；未授权的账号不会收到服务通知。</view>
+  </view>
+</view>

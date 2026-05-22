@@ -1,0 +1,29 @@
+.panel {
+  margin-bottom: 18rpx;
+  padding: 24rpx;
+  border: 1rpx solid #dbe5e2;
+  border-radius: 8rpx;
+  background: #fff;
+}
+
+.row {
+  display: flex;
+  justify-content: space-between;
+  gap: 20rpx;
+  padding: 14rpx 0;
+  border-bottom: 1rpx solid #eef3f1;
+  font-size: 26rpx;
+}
+
+.hint {
+  padding: 12rpx 0;
+  color: #475569;
+  font-size: 28rpx;
+  line-height: 1.6;
+}
+
+.todo {
+  padding: 14rpx 0;
+  color: #475569;
+  font-size: 28rpx;
+}
