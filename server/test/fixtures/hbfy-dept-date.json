@@ -1,0 +1,218 @@
+{
+  "msg": "获取医生列表成功!",
+  "rc": 1,
+  "doclist": [
+    {
+      "hospital_id": "c84fa68d-9d8b-4581-b59c-66443e85ba51",
+      "hospital_name": "光谷院区",
+      "dept_code": "633",
+      "dept_name": "专家门诊",
+      "doctor_no": "1387781218573",
+      "doctor_title": "副主任医师",
+      "doctor_name": "赵密",
+      "scheduleExtInfo": {
+        "outpDate": "2026-05-25",
+        "morning": null,
+        "afternoon": null,
+        "alldayinfo": null,
+        "nightdayinfo": null
+      }
+    },
+    {
+      "hospital_id": "c84fa68d-9d8b-4581-b59c-66443e85ba51",
+      "hospital_name": "光谷院区",
+      "dept_code": "633",
+      "dept_name": "专家门诊",
+      "doctor_no": "1803611219823",
+      "doctor_title": "副主任医师",
+      "doctor_name": "鲁力",
+      "scheduleExtInfo": {
+        "outpDate": "2026-05-25",
+        "morning": {
+          "status": "2",
+          "value": "专家号",
+          "fee": "14.5",
+          "isOpen": 0,
+          "scheduleInfo": {
+            "reserveFee": "14.5",
+            "week": "周一",
+            "date": "05-25",
+            "deptCode": "633",
+            "doctorNo": "1803611219823",
+            "reserveFlag": 2,
+            "outpDate": "2026-05-25",
+            "scheduleId": "6482060149905",
+            "outptypename": "专家号",
+            "deptName": "光谷超声诊断科",
+            "hospitalName": "湖北省妇幼保健院光谷分院",
+            "hospitalId": "04",
+            "doctorName": "鲁力",
+            "timeInterval": "AM"
+          }
+        },
+        "afternoon": {
+          "status": "2",
+          "value": "专家号",
+          "fee": "14.5",
+          "isOpen": 0,
+          "scheduleInfo": {
+            "reserveFee": "14.5",
+            "week": "周一",
+            "date": "05-25",
+            "deptCode": "633",
+            "doctorNo": "1803611219823",
+            "reserveFlag": 2,
+            "outpDate": "2026-05-25",
+            "scheduleId": "9272590149909",
+            "outptypename": "专家号",
+            "deptName": "光谷超声诊断科",
+            "hospitalName": "湖北省妇幼保健院光谷分院",
+            "hospitalId": "04",
+            "doctorName": "鲁力",
+            "timeInterval": "PM"
+          }
+        }
+      }
+    },
+    {
+      "hospital_id": "c84fa68d-9d8b-4581-b59c-66443e85ba51",
+      "hospital_name": "光谷院区",
+      "dept_code": "633",
+      "dept_name": "专家门诊",
+      "doctor_no": "4162181811578",
+      "doctor_title": "副主任医师",
+      "doctor_name": "张莉",
+      "scheduleExtInfo": {
+        "outpDate": "2026-05-25",
+        "morning": null,
+        "afternoon": null
+      }
+    },
+    {
+      "hospital_id": "c84fa68d-9d8b-4581-b59c-66443e85ba51",
+      "hospital_name": "光谷院区",
+      "dept_code": "633",
+      "dept_name": "专家门诊",
+      "doctor_no": "4819931500243",
+      "doctor_title": "副主任医师",
+      "doctor_name": "路小军",
+      "scheduleExtInfo": {
+        "outpDate": "2026-05-25",
+        "morning": {
+          "status": "2",
+          "value": "专家号",
+          "fee": "14.5",
+          "isOpen": 0,
+          "scheduleInfo": {
+            "reserveFee": "14.5",
+            "week": "周一",
+            "date": "05-25",
+            "deptCode": "633",
+            "doctorNo": "4819931500243",
+            "reserveFlag": 2,
+            "outpDate": "2026-05-25",
+            "scheduleId": "9265560149915",
+            "outptypename": "专家号",
+            "deptName": "光谷超声诊断科",
+            "hospitalName": "湖北省妇幼保健院光谷分院",
+            "hospitalId": "04",
+            "doctorName": "路小军",
+            "timeInterval": "AM"
+          }
+        },
+        "afternoon": {
+          "status": "2",
+          "value": "专家号",
+          "fee": "14.5",
+          "isOpen": 0,
+          "scheduleInfo": {
+            "reserveFee": "14.5",
+            "week": "周一",
+            "date": "05-25",
+            "deptCode": "633",
+            "doctorNo": "4819931500243",
+            "reserveFlag": 2,
+            "outpDate": "2026-05-25",
+            "scheduleId": "6278020149921",
+            "outptypename": "专家号",
+            "deptName": "光谷超声诊断科",
+            "hospitalName": "湖北省妇幼保健院光谷分院",
+            "hospitalId": "04",
+            "doctorName": "路小军",
+            "timeInterval": "PM"
+          }
+        }
+      }
+    },
+    {
+      "hospital_id": "c84fa68d-9d8b-4581-b59c-66443e85ba51",
+      "hospital_name": "光谷院区",
+      "dept_code": "633",
+      "dept_name": "专家门诊",
+      "doctor_no": "5596481516914",
+      "doctor_title": "副主任医师",
+      "doctor_name": "张涛",
+      "scheduleExtInfo": {
+        "outpDate": "2026-05-25",
+        "morning": null,
+        "afternoon": null
+      }
+    },
+    {
+      "hospital_id": "c84fa68d-9d8b-4581-b59c-66443e85ba51",
+      "hospital_name": "光谷院区",
+      "dept_code": "633",
+      "dept_name": "专家门诊",
+      "doctor_no": "6207571617643",
+      "doctor_title": "主任医师",
+      "doctor_name": "杨小红",
+      "scheduleExtInfo": {
+        "outpDate": "2026-05-25",
+        "morning": {
+          "status": "2",
+          "value": "专家号",
+          "fee": "21.5",
+          "isOpen": 0,
+          "scheduleInfo": {
+            "reserveFee": "21.5",
+            "week": "周一",
+            "date": "05-25",
+            "deptCode": "633",
+            "doctorNo": "6207571617643",
+            "reserveFlag": 2,
+            "outpDate": "2026-05-25",
+            "scheduleId": "2968410149747",
+            "outptypename": "专家号",
+            "deptName": "光谷超声诊断科",
+            "hospitalName": "湖北省妇幼保健院光谷分院",
+            "hospitalId": "04",
+            "doctorName": "杨小红",
+            "timeInterval": "AM"
+          }
+        },
+        "afternoon": {
+          "status": "2",
+          "value": "专家号",
+          "fee": "21.5",
+          "isOpen": 0,
+          "scheduleInfo": {
+            "reserveFee": "21.5",
+            "week": "周一",
+            "date": "05-25",
+            "deptCode": "633",
+            "doctorNo": "6207571617643",
+            "reserveFlag": 2,
+            "outpDate": "2026-05-25",
+            "scheduleId": "9706620149747",
+            "outptypename": "专家号",
+            "deptName": "光谷超声诊断科",
+            "hospitalName": "湖北省妇幼保健院光谷分院",
+            "hospitalId": "04",
+            "doctorName": "杨小红",
+            "timeInterval": "PM"
+          }
+        }
+      }
+    }
+  ]
+}

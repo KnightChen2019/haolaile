@@ -1,0 +1,225 @@
+{
+  "limiteinfo": {},
+  "success": true,
+  "datainfo": {
+    "deptNames": "风湿免疫内科",
+    "doctorCode": "101110",
+    "doctorName": "凃巍",
+    "doctorTitle": "副主任医师",
+    "doctorlx": "医生",
+    "paibanKsTitle": "风湿免疫内科",
+    "zc": "副主任医师",
+    "zc2": ""
+  },
+  "datalist": [
+    {
+      "hospitalmc": "光谷院区",
+      "xh": 1,
+      "deptName": "风湿免疫内科",
+      "schedule": [
+        {
+          "deptName": "风湿免疫内科",
+          "schedulecode": "42628134121778155412576",
+          "paibanid": "9F0FA4D3-B3EC-493A-985B-47B93F06536F",
+          "scheduleType": "23",
+          "clinicDate": "2026-05-28",
+          "doctorCode": "101110",
+          "sumFee": 601.5,
+          "yystatus": "可约",
+          "ghlx": "专家门诊",
+          "clinicDuration": "上午",
+          "deptCode": "023307"
+        },
+        {
+          "deptName": "风湿免疫内科",
+          "schedulecode": "62089011481778760219258",
+          "paibanid": "591E4A4C-D883-44A1-A178-7AD3D6CEBCF9",
+          "scheduleType": "23",
+          "clinicDate": "2026-06-04",
+          "doctorCode": "101110",
+          "sumFee": 601.5,
+          "yystatus": "可约",
+          "ghlx": "专家门诊",
+          "clinicDuration": "上午",
+          "deptCode": "023307"
+        }
+      ],
+      "hospitaldm": "270018",
+      "doctorCode": "101110",
+      "deptCode": "023307"
+    },
+    {
+      "hospitalmc": "汉口院区",
+      "xh": 2,
+      "deptName": "风湿免疫内科",
+      "schedule": [
+        {
+          "deptName": "风湿免疫内科",
+          "schedulecode": "37644778931777896245441",
+          "paibanid": "BEDAF5EC-CB3C-496F-9BAD-46D0395F59DC",
+          "scheduleType": "3",
+          "clinicDate": "2026-05-25",
+          "doctorCode": "101110",
+          "sumFee": 18.5,
+          "yystatus": "候满",
+          "ghlx": "专家门诊",
+          "clinicDuration": "下午",
+          "deptCode": "010108"
+        },
+        {
+          "deptName": "风湿免疫内科",
+          "schedulecode": "58206044261777982680803",
+          "paibanid": "9D355A88-8FA4-4219-B56E-88970D00E0F5",
+          "scheduleType": "3",
+          "clinicDate": "2026-05-26",
+          "doctorCode": "101110",
+          "sumFee": 18.5,
+          "yystatus": "候满",
+          "ghlx": "专家门诊",
+          "clinicDuration": "上午",
+          "deptCode": "010108"
+        }
+      ],
+      "hospitaldm": "270017",
+      "doctorCode": "101110",
+      "deptCode": "010108"
+    }
+  ],
+  "datalistbyyq": [
+    {
+      "hospitalmc": "光谷院区",
+      "schedule": [
+        {
+          "deptName": "风湿免疫内科",
+          "schedulecode": "42628134121778155412576",
+          "paibanid": "9F0FA4D3-B3EC-493A-985B-47B93F06536F",
+          "scheduleType": "23",
+          "tingzheng": false,
+          "clinicDate": "2026-05-28",
+          "doctorCode": "101110",
+          "sumFee": 601.5,
+          "yystatus": "可约",
+          "ghlx": "专家门诊",
+          "clinicDuration": "上午",
+          "deptCode": "023307"
+        },
+        {
+          "deptName": "风湿免疫内科",
+          "schedulecode": "62089011481778760219258",
+          "paibanid": "591E4A4C-D883-44A1-A178-7AD3D6CEBCF9",
+          "scheduleType": "23",
+          "tingzheng": false,
+          "clinicDate": "2026-06-04",
+          "doctorCode": "101110",
+          "sumFee": 601.5,
+          "yystatus": "可约",
+          "ghlx": "专家门诊",
+          "clinicDuration": "上午",
+          "deptCode": "023307"
+        }
+      ],
+      "hospitaldm": "270018"
+    },
+    {
+      "hospitalmc": "汉口院区",
+      "schedule": [
+        {
+          "deptName": "风湿免疫内科",
+          "schedulecode": "37644778931777896245441",
+          "paibanid": "BEDAF5EC-CB3C-496F-9BAD-46D0395F59DC",
+          "scheduleType": "3",
+          "tingzheng": false,
+          "clinicDate": "2026-05-25",
+          "doctorCode": "101110",
+          "sumFee": 18.5,
+          "yystatus": "候满",
+          "ghlx": "专家门诊",
+          "clinicDuration": "下午",
+          "deptCode": "010108"
+        },
+        {
+          "deptName": "风湿免疫内科",
+          "schedulecode": "58206044261777982680803",
+          "paibanid": "9D355A88-8FA4-4219-B56E-88970D00E0F5",
+          "scheduleType": "3",
+          "tingzheng": false,
+          "clinicDate": "2026-05-26",
+          "doctorCode": "101110",
+          "sumFee": 18.5,
+          "yystatus": "候满",
+          "ghlx": "专家门诊",
+          "clinicDuration": "上午",
+          "deptCode": "010108"
+        },
+        {
+          "deptName": "风湿免疫内科",
+          "schedulecode": "95372763841778069055492",
+          "paibanid": "AA758A46-FB4C-4EC2-889C-1610E423F012",
+          "scheduleType": "3",
+          "tingzheng": false,
+          "clinicDate": "2026-05-27",
+          "doctorCode": "101110",
+          "sumFee": 18.5,
+          "yystatus": "候满",
+          "ghlx": "专家门诊",
+          "clinicDuration": "上午",
+          "deptCode": "010108"
+        },
+        {
+          "deptName": "风湿免疫内科",
+          "schedulecode": "80642907311778501002877",
+          "paibanid": "4852A777-33ED-4F86-8649-FA794366A807",
+          "scheduleType": "3",
+          "tingzheng": false,
+          "clinicDate": "2026-06-01",
+          "doctorCode": "101110",
+          "sumFee": 18.5,
+          "yystatus": "候满",
+          "ghlx": "专家门诊",
+          "clinicDuration": "下午",
+          "deptCode": "010108"
+        },
+        {
+          "deptName": "风湿免疫内科",
+          "schedulecode": "11443023141778587441274",
+          "paibanid": "7257E072-DBA9-4C9E-BE21-C7412789396D",
+          "scheduleType": "3",
+          "tingzheng": false,
+          "clinicDate": "2026-06-02",
+          "doctorCode": "101110",
+          "sumFee": 18.5,
+          "yystatus": "候满",
+          "ghlx": "专家门诊",
+          "clinicDuration": "上午",
+          "deptCode": "010108"
+        },
+        {
+          "deptName": "风湿免疫内科",
+          "schedulecode": "60157427081778673848312",
+          "paibanid": "5579E105-A824-4B25-93CA-AB5AB27D5A8D",
+          "scheduleType": "3",
+          "tingzheng": false,
+          "clinicDate": "2026-06-03",
+          "doctorCode": "101110",
+          "sumFee": 18.5,
+          "yystatus": "候满",
+          "ghlx": "专家门诊",
+          "clinicDuration": "上午",
+          "deptCode": "010108"
+        }
+      ],
+      "hospitaldm": "270017"
+    },
+    {
+      "hospitalmc": "中法院区",
+      "schedule": [],
+      "hospitaldm": "270023"
+    },
+    {
+      "hospitalmc": "军山院区",
+      "schedule": [],
+      "hospitaldm": "270019"
+    }
+  ],
+  "msg": ""
+}
