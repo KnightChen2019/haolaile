@@ -34,4 +34,9 @@ test("parseTjhappV2: 林星光仅返回光谷+020302+可约的 slot", () => {
     true,
     "所有 slot 必须是 020302 产科"
   );
+  assert.equal(
+    result.slots.every((slot) => slot.doctorName === "林星光"),
+    true,
+    "所有 slot 的 doctorName 应来自 payload.datainfo.doctorName"
+  );
 });

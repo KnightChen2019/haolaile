@@ -1,5 +1,6 @@
 export function parseTjhappV2(payload, options) {
   const { monitorId, filter = {} } = options;
+  const doctorName = String(payload?.datainfo?.doctorName || "");
   const allowedHospitals = new Set((filter.hospitaldm || []).map(String));
   const allowedDepts = new Set((filter.deptCode || []).map(String));
   const allowedStatuses = new Set((filter.yystatus || ["可约"]).map(String));
@@ -20,7 +21,7 @@ export function parseTjhappV2(payload, options) {
       }
       const yystatus = String(schedule.yystatus || "");
       const isAvailable = allowedStatuses.has(yystatus);
-      const slot = toTjhappSlot(schedule, group, isAvailable, monitorId);
+      const slot = toTjhappSlot(schedule, group, isAvailable, monitorId, doctorName);
       slots.push(slot);
     }
   }
@@ -33,7 +34,7 @@ export function parseTjhappV2(payload, options) {
   };
 }
 
-function toTjhappSlot(schedule, group, isAvailable, monitorId) {
+function toTjhappSlot(schedule, group, isAvailable, monitorId, doctorName) {
   const visitDate = String(schedule.clinicDate || "");
   const durationName = String(schedule.clinicDuration || "");
   const deptCode = String(schedule.deptCode || "");
@@ -46,7 +47,7 @@ function toTjhappSlot(schedule, group, isAvailable, monitorId) {
     availableStatusName: String(schedule.yystatus || ""),
     scheduleId: schedulecode,
     doctorCode: String(schedule.doctorCode || ""),
-    doctorName: "",
+    doctorName,
     hospitalId: hospitaldm,
     hospitalName: String(group.hospitalmc || ""),
     deptCode,
