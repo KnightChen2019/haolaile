@@ -2,6 +2,8 @@ import http from "node:http";
 import { createHash } from "node:crypto";
 import { existsSync, mkdirSync, readFileSync, writeFileSync } from "node:fs";
 import { join } from "node:path";
+import { parseTjhappV2 } from "./parsers/tjhapp-v2.js";
+import { parseHbfyDeptDate } from "./parsers/hbfy-dept-date.js";
 
 function loadEnvFile(envPath) {
   if (!existsSync(envPath)) {
@@ -1103,16 +1105,211 @@ function mergeHospitalAvailabilityResults(results) {
   };
 }
 
+async function queryTjhappV2(monitor) {
+  const sourceConfig = getDoctorSourceConfig(monitor.id);
+  const request = sourceConfig.request || {};
+  const filter = sourceConfig.filter || {};
+
+  const uname = process.env.HOSPITAL_TJH_UNAME || "";
+  const uuid = process.env.HOSPITAL_TJH_UUID || "";
+  const ukey = process.env.HOSPITAL_TJH_UKEY || "";
+  const token = process.env.HOSPITAL_TJH_TOKEN || "";
+
+  if (!uname || !uuid || !ukey || !token) {
+    return {
+      ok: false,
+      error: "tjh_credentials_missing",
+      message: "HOSPITAL_TJH_UNAME/UUID/UKEY/TOKEN 未配置，无法访问同济新接口"
+    };
+  }
+
+  const body = new URLSearchParams({
+    yqcode1: String(request.yqcode1 || ""),
+    kscode1: String(request.kscode1 || ""),
+    doctorCode: String(request.doctorCode || ""),
+    scheduleType: "",
+    laterThan17: "true"
+  }).toString();
+
+  const startedAt = Date.now();
+  try {
+    const response = await fetch("https://tjhapp.com.cn:8013/yuyue/getdocinfoNewV2", {
+      method: "POST",
+      headers: {
+        "plan": "wxapp",
+        "uname": uname,
+        "uuid": uuid,
+        "ukey": ukey,
+        "token": token,
+        "X-Requested-With": "XMLHttpRequest",
+        "Origin": "https://tjhapp.com.cn",
+        "Referer": "https://tjhapp.com.cn/",
+        "Content-Type": "application/x-www-form-urlencoded",
+        "Accept": "application/json"
+      },
+      body
+    });
+    const latencyMs = Date.now() - startedAt;
+    if (!response.ok) {
+      return {
+        ok: false,
+        status: response.status,
+        latencyMs,
+        error: "tjh_http_error",
+        message: `同济接口返回 HTTP ${response.status}（鉴权过期或参数错误，请更新 .env）`
+      };
+    }
+    const payload = await response.json();
+    if (payload?.success === false) {
+      return {
+        ok: false,
+        latencyMs,
+        error: "tjh_api_error",
+        message: payload?.msg || "同济接口 success=false（可能鉴权过期，请更新 .env）"
+      };
+    }
+
+    const parsed = parseTjhappV2(payload, {
+      monitorId: monitor.id,
+      doctorName: monitor.doctorName,
+      departmentName: monitor.departmentName,
+      filter
+    });
+    return {
+      ok: true,
+      status: response.status,
+      latencyMs,
+      hasAvailability: parsed.hasAvailability,
+      slots: parsed.slots,
+      availableSlots: parsed.availableSlots,
+      request: { url: "tjhapp/getdocinfoNewV2", method: "POST" }
+    };
+  } catch (error) {
+    return {
+      ok: false,
+      latencyMs: Date.now() - startedAt,
+      error: "tjh_fetch_failed",
+      message: error.message
+    };
+  }
+}
+
+function buildHbfyDateList(windowDays) {
+  const days = Math.max(1, Number(windowDays || 14));
+  const dates = [];
+  const today = new Date();
+  for (let i = 0; i < days; i += 1) {
+    const target = new Date(today.getTime() + i * 24 * 60 * 60 * 1000);
+    dates.push(formatShanghaiDate(target));
+  }
+  return dates;
+}
+
+async function fetchHbfyForDate(outpDate, request, monitorId) {
+  const url = new URL("https://hbfy3.hbfy.com/Micro04/reservegh");
+  url.searchParams.set("cls", "yygh");
+  url.searchParams.set("m", "geteffdoctorlistext");
+  url.searchParams.set("choiceType", String(request.choiceType || "1"));
+  url.searchParams.set("deptCode", String(request.deptCode || ""));
+  url.searchParams.set("deptLevel", String(request.deptLevel || "2"));
+  url.searchParams.set("doctType", String(request.doctType || "2"));
+  url.searchParams.set("funcId", String(request.funcId || "function03"));
+  url.searchParams.set("parentId", String(request.parentId || request.deptCode || ""));
+  url.searchParams.set("outpDate", outpDate);
+
+  const response = await fetch(url.toString(), { method: "GET" });
+  if (!response.ok) {
+    throw new Error(`hbfy_http_${response.status}`);
+  }
+  const payload = await response.json();
+  return parseHbfyDeptDate(payload, {
+    monitorId,
+    outpDate,
+    filter: { excludeStatuses: ["2"] },
+    onUnknownStatus: (status) => {
+      logWithShanghaiTime(`妇幼未知 status：${monitorId} outpDate=${outpDate} status=${status}`);
+    }
+  });
+}
+
+async function queryHbfyDeptDate(monitor) {
+  const sourceConfig = getDoctorSourceConfig(monitor.id);
+  const request = sourceConfig.request || {};
+  const windowDays = Number(sourceConfig.windowDays || process.env.HOSPITAL_HBFY_WINDOW_DAYS || 14);
+  const dates = buildHbfyDateList(windowDays);
+  const startedAt = Date.now();
+
+  const settled = await Promise.allSettled(
+    dates.map((date) => fetchHbfyForDate(date, request, monitor.id))
+  );
+  const latencyMs = Date.now() - startedAt;
+  const slots = [];
+  const failures = [];
+  settled.forEach((result, index) => {
+    if (result.status === "fulfilled") {
+      slots.push(...result.value.slots);
+    } else {
+      failures.push(`${dates[index]}:${result.reason?.message || result.reason}`);
+    }
+  });
+
+  if (failures.length === dates.length) {
+    return {
+      ok: false,
+      latencyMs,
+      error: "hbfy_all_failed",
+      message: `妇幼接口全部失败：${failures.slice(0, 3).join("; ")}`
+    };
+  }
+
+  if (failures.length > 0) {
+    logWithShanghaiTime(`妇幼部分日期失败：${failures.join("; ")}`);
+  }
+
+  slots.sort((left, right) => {
+    return [
+      String(left.visitDate || "").localeCompare(String(right.visitDate || "")),
+      String(left.durationCode || "").localeCompare(String(right.durationCode || "")),
+      String(left.doctorCode || "").localeCompare(String(right.doctorCode || ""))
+    ].find((v) => v !== 0) || 0;
+  });
+  const availableSlots = slots.filter((slot) => slot.available);
+
+  return {
+    ok: true,
+    latencyMs,
+    hasAvailability: availableSlots.length > 0,
+    slots,
+    availableSlots,
+    request: { url: "hbfy/Micro04/reservegh", method: "GET" },
+    sourceResults: dates.map((date, index) => ({
+      outpDate: date,
+      ok: settled[index].status === "fulfilled"
+    }))
+  };
+}
+
 async function queryHospitalAvailability(monitor) {
+  const sourceConfig = getDoctorSourceConfig(monitor.id);
+  const parser = sourceConfig.parser || "";
+
+  if (parser === "tjhapp_v2") {
+    return queryTjhappV2(monitor);
+  }
+
+  if (parser === "hbfy_dept_date") {
+    return queryHbfyDeptDate(monitor);
+  }
+
   const sourceConfigs = normalizeDoctorSourceConfigs(monitor.id);
   if (sourceConfigs.length === 1) {
     return queryHospitalAvailabilitySource(monitor, sourceConfigs[0]);
   }
 
   const results = await Promise.all(
-    sourceConfigs.map(async (sourceConfig, index) => {
-      const result = await queryHospitalAvailabilitySource(monitor, sourceConfig);
-      logWithShanghaiTime(`真实接口分源结果：${monitor.doctorName} | ${getSourceLabel(sourceConfig, index)} | ok=${result.ok} | 排班=${Array.isArray(result.slots) ? result.slots.length : 0} | 可约=${Array.isArray(result.availableSlots) ? result.availableSlots.length : 0}`);
+    sourceConfigs.map(async (config, index) => {
+      const result = await queryHospitalAvailabilitySource(monitor, config);
+      logWithShanghaiTime(`真实接口分源结果：${monitor.doctorName} | ${getSourceLabel(config, index)} | ok=${result.ok} | 排班=${Array.isArray(result.slots) ? result.slots.length : 0} | 可约=${Array.isArray(result.availableSlots) ? result.availableSlots.length : 0}`);
       return result;
     })
   );
