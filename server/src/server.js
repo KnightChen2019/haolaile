@@ -1151,7 +1151,8 @@ async function queryTjhappV2(monitor) {
         "Origin": "https://tjhapp.com.cn",
         "Referer": "https://tjhapp.com.cn/",
         "Content-Type": "application/x-www-form-urlencoded",
-        "Accept": "application/json"
+        "Accept": "application/json",
+        "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/132.0.0.0 Safari/537.36 MicroMessenger/7.0.20.1781 MiniProgramEnv/Windows"
       },
       body
     });
@@ -1307,6 +1308,8 @@ async function queryHospitalAvailability(monitor) {
     return queryHbfyDeptDate(monitor);
   }
 
+  // Legacy fallback: requires HOSPITAL_AVAILABILITY_URL (removed from .env.example).
+  // Kept for rollback per spec design §5; currently unused by any monitor.
   const sourceConfigs = normalizeDoctorSourceConfigs(monitor.id);
   if (sourceConfigs.length === 1) {
     return queryHospitalAvailabilitySource(monitor, sourceConfigs[0]);
