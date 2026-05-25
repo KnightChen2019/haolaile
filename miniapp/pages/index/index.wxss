@@ -125,3 +125,18 @@
 .error {
   color: #b91c1c;
 }
+
+.slot-list {
+  margin-top: 16rpx;
+  padding: 14rpx 16rpx;
+  border-radius: 8rpx;
+  background: #f0fdf4;
+  border: 1rpx solid #bbf7d0;
+}
+
+.slot-row {
+  margin: 4rpx 0;
+  color: #166534;
+  font-size: 26rpx;
+  line-height: 1.6;
+}

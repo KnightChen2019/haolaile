@@ -57,12 +57,27 @@ Page({
       method: "GET",
       success: (res) => {
         const payload = res.data || {};
-        const monitors = (payload.monitors || []).map((item) => ({
-          ...item,
-          statusText: item.hasAvailability ? "发现有号" : item.enabled ? "监控中" : "已暂停",
-          statusClass: item.hasAvailability ? "status-found" : item.enabled ? "status-ok" : "status-paused",
-          lastCheckedAtText: formatTime(item.lastCheckedAt)
-        }));
+        const monitors = (payload.monitors || []).map((item) => {
+          const availableSlots = Array.isArray(item.availableSlots) ? item.availableSlots : [];
+          const slotRows = availableSlots.map((slot) => {
+            const segments = [];
+            if (slot.hospitalName) segments.push(slot.hospitalName);
+            if (slot.doctorName) segments.push(slot.doctorName);
+            const meta = segments.join(" · ");
+            const price = slot.regPrice ? ` ¥${slot.regPrice}` : "";
+            return {
+              key: slot.notificationKey || `${slot.visitDate}-${slot.durationName}-${slot.doctorCode || ""}`,
+              text: `${slot.visitDate} ${slot.weekday || ""} ${slot.durationName || ""}${meta ? "  " + meta : ""}${price}`.trim()
+            };
+          });
+          return {
+            ...item,
+            statusText: item.hasAvailability ? "有号" : item.enabled ? "监控中" : "已暂停",
+            statusClass: item.hasAvailability ? "status-found" : item.enabled ? "status-ok" : "status-paused",
+            lastCheckedAtText: formatTime(item.lastCheckedAt),
+            slotRows
+          };
+        });
         const lastCheckedAt = monitors
           .map((item) => item.lastCheckedAt)
           .filter(Boolean)

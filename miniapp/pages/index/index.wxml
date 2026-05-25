@@ -37,12 +37,14 @@
       <view class="doctor-main">
         <view>
           <view class="doctor-name">{{item.doctorName}}</view>
-          <view class="doctor-meta">{{item.departmentName}} · {{item.campusName}} · {{item.registrationType}}</view>
+          <view class="doctor-meta">{{item.departmentName}} · {{item.campusName}}</view>
         </view>
         <view class="status {{item.statusClass}}">{{item.statusText}}</view>
       </view>
-      <view class="result">{{item.lastResultSummary}}</view>
-      <view class="priority">重点时段：{{item.priorityWindow}}</view>
+      <view wx:if="{{item.slotRows.length}}" class="slot-list">
+        <view wx:for="{{item.slotRows}}" wx:for-item="row" wx:key="key" class="slot-row">{{row.text}}</view>
+      </view>
+      <view wx:else class="result">{{item.lastResultSummary || "暂无可约"}}</view>
       <view class="doctor-footer">
         <text>最近检查：{{item.lastCheckedAtText}}</text>
         <text>{{item.enabled ? "监控中" : "已暂停"}}</text>
