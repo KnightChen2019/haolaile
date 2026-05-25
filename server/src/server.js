@@ -570,15 +570,21 @@ function buildSubscribeAlertTip(monitor) {
 
   const slot = Array.isArray(monitor.availableSlots) ? monitor.availableSlots[0] : null;
   if (!slot) {
-    return `${monitor.doctorName}有号，请速看。`;
+    return `${monitor.doctorName || "号源"}有号，请速看。`;
   }
 
+  const doctorName = slot.doctorName || monitor.doctorName || "";
+  const campus = slot.hospitalName ? `${slot.hospitalName} ` : "";
   const timeText = `${slot.visitDate || ""} ${slot.weekday || ""} ${slot.durationName || ""}`.trim();
   const priceText = slot.regPrice ? `，挂号费${slot.regPrice}元` : "";
-  return `${monitor.doctorName}${timeText}有号${priceText}，请速看。`;
+  return `${doctorName}${campus ? " " + campus : ""}${timeText}有号${priceText}，请速看。`.trim();
 }
 
 function getSlotNotificationKey(monitor, slot) {
+  if (slot.notificationKey) {
+    return slot.notificationKey;
+  }
+
   const scheduleId = String(slot.scheduleId || "").trim();
   if (scheduleId) {
     return `${monitor.id}:schedule:${scheduleId}`;
