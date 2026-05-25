@@ -8,11 +8,10 @@
 
   <view class="panel">
     <view class="section-title">监控配置</view>
-    <view class="todo">林星光 · 光谷院区 · 产科</view>
-    <view class="todo">凃巍 · 汉口院区 · 风湿免疫内科</view>
-    <view class="todo">凃巍 · 光谷院区 · 风湿免疫内科</view>
-    <view class="todo">专家号 · 副主任医师</view>
-    <view class="todo">未来 15 天滚动窗口</view>
+    <view class="todo">林星光 · 同济光谷 · 产科 · 仅 deptCode=020302</view>
+    <view class="todo">凃巍 · 同济光谷+汉口 · 风湿免疫内科 · 仅 deptCode=010108</view>
+    <view class="todo">湖北省妇幼-光谷 · 超声诊断科 专家门诊 · 全部医生</view>
+    <view class="todo">未来 14 天滚动窗口</view>
     <view class="todo">重点时段 16:50-17:10</view>
   </view>
 </view>
