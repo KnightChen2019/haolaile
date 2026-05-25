@@ -58,7 +58,8 @@ test("parseTjhappV2: 凃巍接受光谷+汉口，仅 010108 + 可约", () => {
   });
 
   assert.equal(result.hasAvailability, false, "样本中 010108 全为候满/候补，无可约");
-  assert.ok(result.slots.length >= 6, `应包含汉口 010108 的全部排班（6 条）`);
+  assert.equal(result.availableSlots.length, 0);
+  assert.equal(result.slots.length, 6, "汉口 010108 的全部排班应恰好 6 条");
   assert.equal(
     result.slots.every((slot) => slot.deptCode === "010108"),
     true,
