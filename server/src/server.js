@@ -68,42 +68,40 @@ const monitors = [
   {
     id: "lin-xingguang",
     doctorName: "林星光",
-    hospitalName: "武汉同济医院",
+    hospitalName: "同济医院",
     campusName: "光谷院区",
     departmentName: "产科",
-    registrationType: "专家号 · 副主任医师",
+    registrationType: "专家号",
     enabled: true,
     hasAvailability: false,
     lastCheckedAt: new Date().toISOString(),
-    lastResultSummary: "暂无真实接口，当前为 mock 无号状态",
+    lastResultSummary: "等待真实接口结果",
     priorityWindow: "16:50-17:10"
   },
   {
-    id: "tu-wei-hankou",
+    id: "tu-wei",
     doctorName: "凃巍",
-    hospitalName: "武汉同济医院",
-    campusName: "汉口院区",
-    hospitalId: "H0001",
+    hospitalName: "同济医院",
+    campusName: "光谷+汉口",
     departmentName: "风湿免疫内科",
-    registrationType: "专家号 · 副主任医师",
+    registrationType: "专家号",
     enabled: true,
     hasAvailability: false,
     lastCheckedAt: new Date().toISOString(),
-    lastResultSummary: "暂无真实接口，当前为 mock 无号状态",
+    lastResultSummary: "等待真实接口结果",
     priorityWindow: "16:50-17:10"
   },
   {
-    id: "tu-wei-guanggu",
-    doctorName: "凃巍",
-    hospitalName: "武汉同济医院",
+    id: "hbfy-guanggu-chaosheng",
+    doctorName: "妇幼超声",
+    hospitalName: "湖北省妇幼-光谷",
     campusName: "光谷院区",
-    hospitalId: "H0002",
-    departmentName: "风湿免疫内科",
-    registrationType: "专家号 · 副主任医师",
+    departmentName: "超声诊断科 专家门诊",
+    registrationType: "专家号",
     enabled: true,
     hasAvailability: false,
     lastCheckedAt: new Date().toISOString(),
-    lastResultSummary: "暂无真实接口，当前为 mock 无号状态",
+    lastResultSummary: "等待真实接口结果",
     priorityWindow: "16:50-17:10"
   }
 ];
@@ -118,16 +116,7 @@ const monitorState = new Map(
   ])
 );
 
-const legacyDoctorSourceConfigAliases = {
-  "tu-wei-hankou": {
-    legacyId: "tu-wei",
-    hospitalId: "H0001"
-  },
-  "tu-wei-guanggu": {
-    legacyId: "tu-wei",
-    hospitalId: "H0002"
-  }
-};
+const legacyDoctorSourceConfigAliases = {};
 
 function parseJsonEnv(name, fallback) {
   const value = process.env[name];
