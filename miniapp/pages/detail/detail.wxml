@@ -17,10 +17,15 @@
   <view class="panel">
     <view class="section-title">{{windowDays}} 天排班</view>
     <view wx:if="{{!scheduleRows.length}}" class="muted">{{emptyScheduleText}}</view>
-    <view wx:for="{{scheduleRows}}" wx:key="scheduleId" class="schedule-row">
+    <view wx:for="{{scheduleRows}}" wx:key="rowKey" class="schedule-row">
       <view>
         <view class="schedule-date">{{item.visitDate}} {{item.weekday}}</view>
-        <view class="schedule-meta">{{item.durationName}} · {{item.specName || monitor.departmentName}} · {{item.regTypeName}} · ¥{{item.regPrice || "-"}}</view>
+        <view class="schedule-meta">
+          {{item.durationName}}
+          <text wx:if="{{item.hospitalName}}"> · {{item.hospitalName}}</text>
+          <text wx:if="{{item.doctorName}}"> · {{item.doctorName}}</text>
+          <text wx:if="{{item.regPrice}}"> · ¥{{item.regPrice}}</text>
+        </view>
       </view>
       <view class="schedule-status {{item.statusClass}}">{{item.availableStatusName}}</view>
     </view>

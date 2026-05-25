@@ -58,17 +58,20 @@ Page({
         const payload = res.data || {};
         const monitors = payload.monitors || [];
         const monitor = monitors.find((item) => item.id === id) || {};
-        const scheduleRows = (monitor.slots || []).map((slot) => {
-          const statusClass = slot.available
-            ? "schedule-available"
-            : slot.availableStatus === "3"
-              ? "schedule-stopped"
-              : slot.availableStatus === "4"
-                ? "schedule-expired"
-                : "schedule-full";
+        const scheduleRows = (monitor.slots || []).map((slot, index) => {
+          const status = String(slot.availableStatus || "");
+          let statusClass = "schedule-full";
+          if (slot.available) {
+            statusClass = "schedule-available";
+          } else if (status === "3" || status === "停诊") {
+            statusClass = "schedule-stopped";
+          } else if (status === "4" || status === "过期") {
+            statusClass = "schedule-expired";
+          }
           return {
             ...slot,
-            statusClass
+            statusClass,
+            rowKey: slot.notificationKey || slot.scheduleId || `${slot.visitDate}-${slot.durationName}-${index}`
           };
         });
         const emptyScheduleText = monitor.lastCheckedAt
