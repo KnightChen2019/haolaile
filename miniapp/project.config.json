@@ -27,7 +27,7 @@
     }
   },
   "compileType": "miniprogram",
-  "libVersion": "latest",
+  "libVersion": "3.15.1",
   "srcMiniprogramRoot": "./",
   "simulatorPluginLibVersion": {},
   "packOptions": {

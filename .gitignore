@@ -9,3 +9,8 @@ dist/
 coverage/
 miniprogram_npm/
 server/data/
+.claude/
+docs/
+deploy/
+test/
+scripts/

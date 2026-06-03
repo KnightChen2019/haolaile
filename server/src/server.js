@@ -3,7 +3,8 @@ import { createHash } from "node:crypto";
 import { existsSync, mkdirSync, readFileSync, writeFileSync } from "node:fs";
 import { join } from "node:path";
 import { parseTjhappV2 } from "./parsers/tjhapp-v2.js";
-import { parseHbfyDeptDate } from "./parsers/hbfy-dept-date.js";
+import { parseHbfyDeptDate, classifyHbfyResponse, normalizeHbfyCookie } from "./parsers/hbfy-dept-date.js";
+import { classifyCredentialEdge } from "./credential-alert.js";
 
 function loadEnvFile(envPath) {
   if (!existsSync(envPath)) {
@@ -61,6 +62,7 @@ const notifiedSlotsPath = join(dataDir, "notified-slots.json");
 const registeredNotifyOpenids = loadRegisteredNotifyOpenids();
 const notifiedSlotRecords = loadNotifiedSlotRecords();
 const previousMonitorAvailability = new Map();
+const previousMonitorCredentialFailed = new Map();
 let wechatApiTokenCache = { accessToken: "", expiresAt: 0 };
 const hospitalAccessTokenCache = new Map();
 let monitorTimer = null;
@@ -702,6 +704,47 @@ async function maybeNotifyAvailabilityEdge(monitor, monitorPayload) {
   await notifyAvailability(monitor, monitorPayload, "availability_edge");
 }
 
+// 凭证失效（妇幼会话过期 / 同济鉴权过期等）边沿提醒：只在"健康->失效"翻转时提醒一次。
+// 默认只打醒目日志（本地盯终端即可见、不依赖微信配置）；
+// 配置 NOTIFY_CREDENTIAL_ALERT=true 时才额外推微信订阅消息（避免占用宝贵的订阅配额）。
+async function maybeAlertCredentialEdge(monitor, monitorPayload, notify) {
+  const prevFailed = previousMonitorCredentialFailed.get(monitor.id) === true;
+  const { failed, edge } = classifyCredentialEdge(prevFailed, monitorPayload);
+  previousMonitorCredentialFailed.set(monitor.id, failed);
+
+  if (edge === "failed") {
+    logWithShanghaiTime(`⚠️ 凭证失效提醒：${monitor.doctorName}（${monitor.hospitalName || monitor.campusName || ""}）— ${monitorPayload.lastResultSummary || monitorPayload.lastError}`);
+    if (notify && process.env.NOTIFY_CREDENTIAL_ALERT === "true") {
+      await notifyCredentialFailure(monitor, monitorPayload);
+    }
+  } else if (edge === "recovered") {
+    logWithShanghaiTime(`✅ 凭证已恢复：${monitor.doctorName}（${monitor.hospitalName || monitor.campusName || ""}）`);
+  }
+}
+
+async function notifyCredentialFailure(monitor, monitorPayload) {
+  const openids = collectNotifyOpenids();
+  if (openids.length === 0) {
+    logWithShanghaiTime(`凭证失效推送跳过：${monitor.doctorName} notifyOpenids=0`);
+    return;
+  }
+
+  const checkedAt = monitorPayload.lastCheckedAt || new Date().toISOString();
+  const monitorForMessage = {
+    ...monitor,
+    alertTip: monitorPayload.lastResultSummary || "凭证已失效，请更新后台配置",
+    availabilityTime: formatShanghaiDateTime(new Date(checkedAt)).slice(0, 16)
+  };
+  const results = await Promise.all(
+    openids.map(async (openid) => ({
+      openid,
+      ...(await sendSubscribeMessage(openid, monitorForMessage, checkedAt))
+    }))
+  );
+  const okCount = results.filter((result) => result.ok).length;
+  logWithShanghaiTime(`凭证失效推送：${monitor.doctorName} ok=${okCount}/${results.length}`);
+}
+
 function getDoctorSourceConfig(monitorId) {
   const configs = parseJsonEnv("HOSPITAL_DOCTOR_SOURCE_CONFIG_JSON", {});
   if (configs[monitorId]) {
@@ -1212,7 +1255,10 @@ function buildHbfyDateList(windowDays) {
   return dates;
 }
 
-async function fetchHbfyForDate(outpDate, request, monitorId) {
+const HBFY_USER_AGENT =
+  "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/132.0.0.0 Safari/537.36 MicroMessenger/7.0.20.1781 MiniProgramEnv/Windows";
+
+async function fetchHbfyForDate(outpDate, request, monitorId, cookie, filter) {
   const url = new URL("https://hbfy3.hbfy.com/Micro04/reservegh");
   url.searchParams.set("cls", "yygh");
   url.searchParams.set("m", "geteffdoctorlistext");
@@ -1224,15 +1270,37 @@ async function fetchHbfyForDate(outpDate, request, monitorId) {
   url.searchParams.set("parentId", String(request.parentId || request.deptCode || ""));
   url.searchParams.set("outpDate", outpDate);
 
-  const response = await fetch(url.toString(), { method: "GET" });
+  // 该接口需要一个已登录(微信小程序)的 JSESSIONID 会话，否则返回 rc=-1。
+  const response = await fetch(url.toString(), {
+    method: "GET",
+    headers: {
+      "Cookie": cookie,
+      "User-Agent": HBFY_USER_AGENT,
+      "Accept": "application/json, text/plain, */*",
+      "Origin": "https://hbfy3.hbfy.com",
+      "Referer": "https://hbfy3.hbfy.com/"
+    }
+  });
   if (!response.ok) {
     throw new Error(`hbfy_http_${response.status}`);
   }
   const payload = await response.json();
+  const kind = classifyHbfyResponse(payload);
+  if (kind === "session_invalid") {
+    // 会话失效会让 14 个日期全部命中，由 queryHbfyDeptDate 汇总成"请更新 cookie"提示。
+    throw new Error(`hbfy_session_invalid(${payload?.msg || ""})`);
+  }
+  if (kind !== "ok") {
+    // "白班返回为空"=该日无排班（正常）；unknown 文案记一条 warn 以便观察。
+    if (kind === "unknown") {
+      logWithShanghaiTime(`妇幼非预期返回：${monitorId} outpDate=${outpDate} rc=${payload?.rc} msg=${payload?.msg || ""}`);
+    }
+    return { hasAvailability: false, slots: [], availableSlots: [] };
+  }
   return parseHbfyDeptDate(payload, {
     monitorId,
     outpDate,
-    filter: { excludeStatuses: ["2"] },
+    filter: filter || {},
     onUnknownStatus: (status) => {
       logWithShanghaiTime(`妇幼未知 status：${monitorId} outpDate=${outpDate} status=${status}`);
     }
@@ -1243,11 +1311,22 @@ async function queryHbfyDeptDate(monitor) {
   const sourceConfig = getDoctorSourceConfig(monitor.id);
   const request = sourceConfig.request || {};
   const windowDays = Number(sourceConfig.windowDays || process.env.HOSPITAL_HBFY_WINDOW_DAYS || 14);
+
+  const cookie = normalizeHbfyCookie(process.env.HOSPITAL_HBFY_COOKIE);
+  if (!cookie) {
+    return {
+      ok: false,
+      error: "hbfy_cookie_missing",
+      message: "HOSPITAL_HBFY_COOKIE 未配置（需登录妇幼小程序抓 JSESSIONID 填入 .env），无法访问妇幼接口"
+    };
+  }
+
+  const filter = sourceConfig.filter || {};
   const dates = buildHbfyDateList(windowDays);
   const startedAt = Date.now();
 
   const settled = await Promise.allSettled(
-    dates.map((date) => fetchHbfyForDate(date, request, monitor.id))
+    dates.map((date) => fetchHbfyForDate(date, request, monitor.id, cookie, filter))
   );
   const latencyMs = Date.now() - startedAt;
   const slots = [];
@@ -1261,11 +1340,14 @@ async function queryHbfyDeptDate(monitor) {
   });
 
   if (failures.length === dates.length) {
+    const sessionExpired = failures.some((f) => f.includes("hbfy_session_invalid"));
     return {
       ok: false,
       latencyMs,
-      error: "hbfy_all_failed",
-      message: `妇幼接口全部失败：${failures.slice(0, 3).join("; ")}`
+      error: sessionExpired ? "hbfy_session_invalid" : "hbfy_all_failed",
+      message: sessionExpired
+        ? "妇幼会话失效（rc=-1 获取医生异常），请重新登录小程序抓 JSESSIONID 更新 HOSPITAL_HBFY_COOKIE"
+        : `妇幼接口全部失败：${failures.slice(0, 3).join("; ")}`
     };
   }
 
@@ -1389,6 +1471,8 @@ async function runMonitorTick({ notify = true, trigger = "manual" } = {}) {
       lastCheckedAt: checkedAt
     };
     monitorState.set(monitor.id, payload);
+
+    await maybeAlertCredentialEdge(monitor, payload, notify);
 
     if (notify) {
       await maybeNotifyAvailabilityEdge(monitor, payload);

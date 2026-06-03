@@ -1,6 +1,28 @@
+// 接口对所有情况都返回 HTTP 200，靠 rc/msg 区分：
+//   rc=1            → 正常（即便当天全约满，doclist 仍非空）
+//   rc=-1 获取医生异常 → 会话失效（未登录/JSESSIONID 过期）
+//   rc=-1 …为空      → 该日尚无排班，正常的空结果
+//   其它 rc!=1       → 未知，按空处理但记日志观察
+// 容忍只粘贴了 session id 的情况：无 "=" 时自动补 JSESSIONID= 前缀。
+export function normalizeHbfyCookie(raw) {
+  const value = String(raw || "").trim();
+  if (!value) return "";
+  return value.includes("=") ? value : `JSESSIONID=${value}`;
+}
+
+export function classifyHbfyResponse(payload) {
+  if (payload?.rc === 1) return "ok";
+  const msg = String(payload?.msg || "");
+  if (msg.includes("获取医生异常")) return "session_invalid";
+  if (msg.includes("为空")) return "empty";
+  return "unknown";
+}
+
 export function parseHbfyDeptDate(payload, options) {
   const { monitorId, outpDate, filter = {}, onUnknownStatus } = options;
-  const excludeStatuses = new Set((filter.excludeStatuses || ["2"]).map(String));
+  // 白名单：只有这些 status 视为可约。默认仅 "1"（实测 2/7=约满、3=停诊）。
+  // 未知 status 一律按"不可约"处理，避免把停诊/约满误报成有号刷屏。
+  const availableStatuses = new Set((filter.availableStatuses || ["1"]).map(String));
 
   const slots = [];
   const doctors = Array.isArray(payload?.doclist) ? payload.doclist : [];
@@ -10,10 +32,10 @@ export function parseHbfyDeptDate(payload, options) {
     const dateValue = String(ext.outpDate || outpDate || "");
 
     if (ext.morning && typeof ext.morning === "object") {
-      slots.push(toHbfySlot(doctor, ext.morning, "上午", "AM", dateValue, excludeStatuses, monitorId, onUnknownStatus));
+      slots.push(toHbfySlot(doctor, ext.morning, "上午", "AM", dateValue, availableStatuses, monitorId, onUnknownStatus));
     }
     if (ext.afternoon && typeof ext.afternoon === "object") {
-      slots.push(toHbfySlot(doctor, ext.afternoon, "下午", "PM", dateValue, excludeStatuses, monitorId, onUnknownStatus));
+      slots.push(toHbfySlot(doctor, ext.afternoon, "下午", "PM", dateValue, availableStatuses, monitorId, onUnknownStatus));
     }
   }
 
@@ -25,12 +47,13 @@ export function parseHbfyDeptDate(payload, options) {
   };
 }
 
-function toHbfySlot(doctor, period, durationName, durationCode, visitDate, excludeStatuses, monitorId, onUnknownStatus) {
+function toHbfySlot(doctor, period, durationName, durationCode, visitDate, availableStatuses, monitorId, onUnknownStatus) {
   const status = String(period.status || "");
-  const isAvailable = !excludeStatuses.has(status);
+  const isAvailable = availableStatuses.has(status);
   let availableStatusName = "未知";
   if (status === "1") availableStatusName = "可约";
-  else if (status === "2") availableStatusName = "约满";
+  else if (status === "2" || status === "7") availableStatusName = "约满";
+  else if (status === "3") availableStatusName = "停诊";
   else {
     availableStatusName = `status=${status}`;
     if (typeof onUnknownStatus === "function") {
